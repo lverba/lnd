@@ -197,9 +197,11 @@ func loadConfig() (*config, error) {
 	}
 
 	if cfg.Litecoin.Active {
+		// Assume testnet
+		liteParamsToApply := &liteTestNetParams
+
 		if cfg.Litecoin.SimNet {
-			str := "%s: simnet mode for litecoin not currently supported"
-			return nil, fmt.Errorf(str, funcName)
+			liteParamsToApply = &liteSimNetParams
 		}
 
 		// The litecoin chain is the current active chain. However
@@ -207,7 +209,7 @@ func loadConfig() (*config, error) {
 		// temporary hack, we'll mutate the default net params for
 		// bitcoin with the litecoin specific informat.ion
 		paramCopy := bitcoinTestNetParams
-		applyLitecoinParams(&paramCopy)
+		applyLitecoinParams(&paramCopy, liteParamsToApply)
 		activeNetParams = paramCopy
 
 		if !cfg.NeutrinoMode.Active {
