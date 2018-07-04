@@ -449,6 +449,18 @@ func (b *BtcWallet) PublishTransaction(tx *wire.MsgTx) error {
 		}
 		return err
 	}
+
+	switch b.chain.(type) {
+		// For neutrino we need to trigger adding relevant tx manually
+		case *chain.NeutrinoClient:
+			rec, err := wtxmgr.NewTxRecordFromMsgTx(tx, time.Now())
+			if err != nil {
+				return err
+			}
+
+			b.wallet.AddRelevantTx(rec, nil)
+	}
+
 	return nil
 }
 
