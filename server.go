@@ -2068,6 +2068,8 @@ func (s *server) peerTerminationWatcher(p *peer) {
 // returned.
 func (s *server) nextPeerBackoff(pubStr string,
 	startTime time.Time) time.Duration {
+	// We need to make reconnection with static amount of time.
+	return 10 * time.Second
 
 	// Now, determine the appropriate backoff to use for the retry.
 	backoff, ok := s.persistentPeersBackoff[pubStr]
