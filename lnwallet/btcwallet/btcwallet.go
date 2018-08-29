@@ -18,6 +18,8 @@ import (
 	"github.com/btcsuite/btcwallet/chain"
 	"github.com/btcsuite/btcwallet/waddrmgr"
 	base "github.com/btcsuite/btcwallet/wallet"
+	"github.com/btcsuite/btcwallet/wallet/txauthor"
+	"github.com/btcsuite/btcwallet/wallet/txrules"
 	"github.com/btcsuite/btcwallet/walletdb"
 	"github.com/lightningnetwork/lnd/keychain"
 	"github.com/lightningnetwork/lnd/lnwallet"
@@ -278,7 +280,40 @@ func (b *BtcWallet) SendOutputs(outputs []*wire.TxOut,
 	// SendOutputs.
 	feeSatPerKB := btcutil.Amount(feeRate.FeePerKVByte())
 
+	// Sanity check outputs.
+	if len(outputs) < 1 {
+		return nil, lnwallet.ErrNoOutputs
+	}
 	return b.wallet.SendOutputs(outputs, defaultAccount, 1, feeSatPerKB)
+}
+
+// CreateSimpleTx creates a Bitcoin transaction paying to the specified
+// outputs. The transaction is not broadcasted to the network, but a new change
+// address might be created in the wallet database. In the case the wallet has
+// insufficient funds, or the outputs are non-standard, an error should be
+// returned. This method also takes the target fee expressed in sat/vbyte that
+// should be used when crafting the transaction.
+//
+// This is a part of the WalletController interface.
+func (b *BtcWallet) CreateSimpleTx(outputs []*wire.TxOut,
+	feeRate lnwallet.SatPerKWeight) (*txauthor.AuthoredTx, error) {
+
+	// The fee rate is passed in using units of sat/vbyte, so we'll scale
+	// this up to sat/KB as the CreateSimpleTx method requires this unit.
+	feeSatPerKB := btcutil.Amount(feeRate)
+
+	// Sanity check outputs.
+	if len(outputs) < 1 {
+		return nil, lnwallet.ErrNoOutputs
+	}
+	for _, output := range outputs {
+		err := txrules.CheckOutput(output, feeSatPerKB)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return b.wallet.CreateSimpleTx(defaultAccount, outputs, 1, feeSatPerKB)
 }
 
 // LockOutpoint marks an outpoint as locked meaning it will no longer be deemed

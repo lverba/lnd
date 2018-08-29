@@ -12,6 +12,7 @@ import (
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
+	"github.com/btcsuite/btcwallet/wallet/txauthor"
 	"github.com/lightningnetwork/lnd/chainntnfs"
 	"github.com/lightningnetwork/lnd/keychain"
 	"github.com/lightningnetwork/lnd/lnwallet"
@@ -228,6 +229,12 @@ func (*mockWalletController) GetPrivKey(a btcutil.Address) (*btcec.PrivateKey, e
 
 func (*mockWalletController) SendOutputs(outputs []*wire.TxOut,
 	_ lnwallet.SatPerKWeight) (*chainhash.Hash, error) {
+
+	return nil, nil
+}
+
+func (*mockWalletController) CreateSimpleTx(outputs []*wire.TxOut,
+	_ lnwallet.SatPerKWeight) (*txauthor.AuthoredTx, error) {
 
 	return nil, nil
 }
