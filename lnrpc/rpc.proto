@@ -223,7 +223,8 @@ service Lightning {
     */
     rpc EstimateFee (EstimateFeeRequest) returns (EstimateFeeResponse) {
         option (google.api.http) = {
-            get: "/v1/transactions/fee"
+            post: "/v1/transactions/fee"
+            body: "*"
         };
     }
 

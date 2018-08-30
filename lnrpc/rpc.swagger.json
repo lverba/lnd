@@ -945,7 +945,7 @@
       }
     },
     "/v1/transactions/fee": {
-      "get": {
+      "post": {
         "summary": "* lncli: `estimatefee`\nEstimateFee asks the chain backend to estimate the fee rate and total fees\nfor a transaction that pays to multiple specified outputs.",
         "operationId": "EstimateFee",
         "responses": {
@@ -958,12 +958,12 @@
         },
         "parameters": [
           {
-            "name": "target_conf",
-            "description": "/ The target number of blocks that this transaction should be confirmed by.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/lnrpcEstimateFeeRequest"
+            }
           }
         ],
         "tags": [
@@ -1584,6 +1584,24 @@
     },
     "lnrpcDisconnectPeerResponse": {
       "type": "object"
+    },
+    "lnrpcEstimateFeeRequest": {
+      "type": "object",
+      "properties": {
+        "AddrToAmount": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "int64"
+          },
+          "description": "/ The map from addresses to amounts for the transaction."
+        },
+        "target_conf": {
+          "type": "integer",
+          "format": "int32",
+          "description": "/ The target number of blocks that this transaction should be confirmed by."
+        }
+      }
     },
     "lnrpcEstimateFeeResponse": {
       "type": "object",
